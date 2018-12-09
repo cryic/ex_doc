@@ -317,7 +317,11 @@ defmodule ExDoc.Retriever do
 
   ## Callback helpers
 
-  defp get_callbacks(%{type: :behaviour, name: name, abst_code: abst_code, docs: docs}, source, module_name) do
+  defp get_callbacks(
+         %{type: :behaviour, name: name, abst_code: abst_code, docs: docs},
+         source,
+         module_name
+       ) do
     {:docs_v1, _, _, _, _, _, docs} = docs
     optional_callbacks = name.behaviour_info(:optional_callbacks)
 
