@@ -6,7 +6,7 @@
     <span id="<%=enc_h link_id(default, node.type) %>"></span>
   <% end %>
   <div class="detail-header">
-    <a href="#<%=enc_h link_id(node) %>" class="detail-link" title="Link to this <%= pretty_type(node) %>">
+    <a href="#<%=enc_h link_id(node) %>" class="detail-link" title="Link to <%= "#{node.module}.#{link_id(node)}" %>">
       <span class="icon-link" aria-hidden="true"></span>
       <span class="sr-only">Link to this <%= pretty_type(node) %></span>
     </a>
