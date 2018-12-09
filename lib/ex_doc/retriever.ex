@@ -125,12 +125,12 @@ defmodule ExDoc.Retriever do
     {doc_line, moduledoc, metadata} = get_module_docs(module_data)
     line = find_module_line(module_data) || doc_line
 
+    {function_groups, function_docs} = get_docs(module_data, source, config)
+    docs = function_docs ++ get_callbacks(module_data, source)
+    types = get_types(module_data, source)
     {title, id} = module_title_and_id(module_data)
     module_group = GroupMatcher.match_module(config.groups_for_modules, module, id)
     {nested_title, nested_context} = nesting_info(title, config.nest_modules_by_prefix)
-    {function_groups, function_docs} = get_docs(module_data, source, config, title)
-    docs = function_docs ++ get_callbacks(module_data, source, title)
-    types = get_types(module_data, source, title)
 
     %ExDoc.ModuleNode{
       id: id,
@@ -202,7 +202,7 @@ defmodule ExDoc.Retriever do
 
   ## Function helpers
 
-  defp get_docs(%{type: type, docs: docs} = module_data, source, config, module_name) do
+  defp get_docs(%{type: type, docs: docs} = module_data, source, config) do
     {:docs_v1, _, _, _, _, _, docs} = docs
 
     groups_for_functions =
@@ -212,7 +212,7 @@ defmodule ExDoc.Retriever do
 
     function_docs =
       for doc <- docs, doc?(doc, type) do
-        get_function(doc, source, module_data, groups_for_functions, module_name)
+        get_function(doc, source, module_data, groups_for_functions)
       end
 
     {Enum.map(groups_for_functions, &elem(&1, 0)), function_docs}
@@ -243,7 +243,7 @@ defmodule ExDoc.Retriever do
     true
   end
 
-  defp get_function(function, source, module_data, groups_for_functions, module_name) do
+  defp get_function(function, source, module_data, groups_for_functions) do
     {{type, name, arity}, anno, signature, doc, metadata} = function
     actual_def = actual_def(name, arity, type)
     doc_line = anno_line(anno)
@@ -291,8 +291,7 @@ defmodule ExDoc.Retriever do
       source_url: source_link(source, line),
       type: type,
       group: group,
-      annotations: annotations,
-      module: module_name
+      annotations: annotations
     }
   end
 
@@ -322,22 +321,18 @@ defmodule ExDoc.Retriever do
 
   ## Callback helpers
 
-  defp get_callbacks(
-         %{type: :behaviour, name: name, abst_code: abst_code, docs: docs},
-         source,
-         module_name
-       ) do
+  defp get_callbacks(%{type: :behaviour, name: name, abst_code: abst_code, docs: docs}, source) do
     {:docs_v1, _, _, _, _, _, docs} = docs
     optional_callbacks = name.behaviour_info(:optional_callbacks)
 
     for {{kind, _, _}, _, _, _, _} = doc <- docs, kind in [:callback, :macrocallback] do
-      get_callback(doc, source, optional_callbacks, abst_code, module_name)
+      get_callback(doc, source, optional_callbacks, abst_code)
     end
   end
 
-  defp get_callbacks(_, _, _), do: []
+  defp get_callbacks(_, _), do: []
 
-  defp get_callback(callback, source, optional_callbacks, abst_code, module_name) do
+  defp get_callback(callback, source, optional_callbacks, abst_code) do
     {{kind, name, arity}, anno, _, doc, metadata} = callback
     actual_def = actual_def(name, arity, kind)
     doc_line = anno_line(anno)
@@ -364,8 +359,7 @@ defmodule ExDoc.Retriever do
       source_path: source.path,
       source_url: source_link(source, line),
       type: kind,
-      annotations: annotations,
-      module: module_name
+      annotations: annotations
     }
   end
 
@@ -400,15 +394,15 @@ defmodule ExDoc.Retriever do
         do: behaviour
   end
 
-  defp get_types(%{docs: docs} = module_data, source, module_name) do
+  defp get_types(%{docs: docs} = module_data, source) do
     {:docs_v1, _, _, _, _, _, docs} = docs
 
     for {{:type, _, _}, _, _, content, _} = doc <- docs, content != :hidden do
-      get_type(doc, source, module_data.abst_code, module_name)
+      get_type(doc, source, module_data.abst_code)
     end
   end
 
-  defp get_type(type, source, abst_code, module_name) do
+  defp get_type(type, source, abst_code) do
     {{_, name, arity}, anno, _, doc, metadata} = type
     doc_line = anno_line(anno)
     annotations = annotations_from_metadata(metadata)
@@ -439,8 +433,7 @@ defmodule ExDoc.Retriever do
       signature: get_typespec_signature(spec, arity),
       source_path: source.path,
       source_url: source_link(source, line),
-      annotations: annotations,
-      module: module_name
+      annotations: annotations
     }
   end
 

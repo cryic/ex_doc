@@ -56,8 +56,7 @@ defmodule ExDoc.FunctionNode do
             group: nil,
             doc_line: nil,
             source_path: nil,
-            source_url: nil,
-            module: nil
+            source_url: nil
 
   @type t :: %__MODULE__{
           id: nil | String.t(),
@@ -73,8 +72,7 @@ defmodule ExDoc.FunctionNode do
           signature: nil | String.t(),
           specs: list(),
           annotations: list(),
-          deprecated: nil | String.t(),
-          module: nil | String.t()
+          deprecated: nil | String.t()
         }
 end
 
@@ -94,8 +92,7 @@ defmodule ExDoc.TypeNode do
             source_url: nil,
             spec: nil,
             signature: nil,
-            annotations: [],
-            module: nil
+            annotations: []
 
   @type t :: %__MODULE__{
           id: nil | String.t(),
@@ -109,7 +106,6 @@ defmodule ExDoc.TypeNode do
           signature: nil | String.t(),
           source_url: nil | String.t(),
           source_path: nil | String.t(),
-          annotations: list(),
-          module: nil | String.t()
+          annotations: list()
         }
 end
