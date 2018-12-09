@@ -284,7 +284,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   end
 
   templates = [
-    detail_template: [:node, :_module],
+    detail_template: [:node, :module],
     footer_template: [:config],
     head_template: [:config, :page],
     module_template: [:config, :module, :summary, :nodes_map],
@@ -294,8 +294,8 @@ defmodule ExDoc.Formatter.HTML.Templates do
     extra_template: [:config, :title, :nodes_map, :content],
     search_template: [:config, :nodes_map],
     sidebar_template: [:config, :nodes_map],
-    summary_template: [:name, :nodes],
-    summary_entry_template: [:node],
+    summary_template: [:name, :nodes, :module],
+    summary_entry_template: [:node, :module],
     redirect_template: [:config, :redirect_to]
   ]
 
