@@ -334,8 +334,12 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
           any
         })}]
 
-      assert content =~ ~s[<a href="#t:public/1" title="Link to TypesAndSpecs.t:public/1">public(t)</a>]
-      refute content =~ ~s[<a href="#t:private/0" title="Link to TypesAndSpecs.t:private/0">private</a>]
+      assert content =~
+               ~s[<a href="#t:public/1" title="Link to TypesAndSpecs.t:public/1">public(t)</a>]
+
+      refute content =~
+               ~s[<a href="#t:private/0" title="Link to TypesAndSpecs.t:private/0">private</a>]
+
       assert content =~ public_html
       assert content =~ ref_html
       refute content =~ ~s[<strong>private\(t\)]
