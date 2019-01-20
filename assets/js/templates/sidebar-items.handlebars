@@ -24,38 +24,38 @@
 
       <ul>
         <li>
-          <a href="{{node.id}}.html#content">Top</a>
+          <a href="{{node.id}}.html#content" title="{{node.title}}">Top</a>
         </li>
 
         {{#isArray node.headers}}
           {{#each node.headers}}
             <li>
-              <a href="{{node.id}}.html#{{{anchor}}}">{{id}}</a>
+              <a href="{{node.id}}.html#{{{anchor}}}" title="{{node.title}} — {{id}}">{{id}}</a>
             </li>
           {{/each}}
         {{else}}
           {{#showSummary node}}
             <li>
-              <a href="{{node.id}}.html#summary">Summary</a>
+              <a href="{{node.id}}.html#summary" title="{{node.title}} Summary">Summary</a>
             </li>
           {{/showSummary}}
           {{#each node.nodeGroups as |group|}}
             <li class="docs">
-              <a href="{{node.id}}.html#{{group.key}}" class="expand">
+              <a href="{{node.id}}.html#{{group.key}}" class="expand" title="{{node.title}} {{group.name}}">
                 {{group.name}}
                 <span class="icon-goto" title="Go to {{group.name}}"></span>
               </a>
               <ul class="{{group.key}}-list deflist">
                 {{#each group.nodes}}
                   <li>
-                    <a href="{{node.id}}.html#{{anchor}}" title="{{node.id}}.{{anchor}}">{{id}}</a>
+                    <a href="{{node.id}}.html#{{anchor}}" title="{{link_title}}">{{id}}</a>
                   </li>
                 {{/each}}
               </ul>
             </li>
           {{/each}}
         {{/isArray}}
-        </ul>
+      </ul>
     </li>
   {{/each}}
 </ul>

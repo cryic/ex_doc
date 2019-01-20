@@ -72,6 +72,14 @@ defmodule ExDoc.Formatter.HTML.Templates do
   end
 
   @doc """
+  Generate a link title
+  """
+  def link_title(module, node) do
+    mfa_without_prefix = "#{module.id}.#{node.id}"
+    link_id(mfa_without_prefix, node.type)
+  end
+
+  @doc """
   Returns the HTML formatted title for the module page.
   """
   def module_title(%{type: :task, title: title}),
@@ -157,9 +165,18 @@ defmodule ExDoc.Formatter.HTML.Templates do
     headers =
       content
       |> extract_headers
-      |> Enum.map_join(",", fn {header, anchor} -> sidebar_items_object(header, anchor) end)
+      |> Enum.map_join(",", fn {header, anchor} ->
+        sidebar_items_object(header, anchor, hyphenize(id, title))
+      end)
 
     ~s/{"id":"#{id}","title":"#{title}","group":"#{group}","headers":[#{headers}]}/
+  end
+
+  defp hyphenize(id, title) do
+    [id, title]
+    |> Enum.filter(&(&1 != ""))
+    |> Enum.filter(&(&1 != nil))
+    |> Enum.join(" — ")
   end
 
   @h2_regex ~r/<h2.*?>(.*?)<\/h2>/m
@@ -173,26 +190,30 @@ defmodule ExDoc.Formatter.HTML.Templates do
   end
 
   defp sidebar_items_node(module_node) do
+    sidebar_items_by_group_with_module = fn group ->
+      sidebar_items_by_group(module_node, group)
+    end
+
     items =
       module_node
       |> module_summary()
       |> Enum.reject(fn {_type, nodes_map} -> nodes_map == [] end)
-      |> Enum.map_join(",", &sidebar_items_by_group/1)
+      |> Enum.map_join(",", fn group -> sidebar_items_by_group_with_module.(group) end)
 
     sidebar_items_json_string(module_node, items)
   end
 
-  defp sidebar_items_by_group({group, docs}) do
+  defp sidebar_items_by_group(module_node, {group, docs}) do
     objects =
       Enum.map_join(docs, ",", fn doc ->
-        sidebar_items_object(doc.id, link_id(doc))
+        sidebar_items_object(doc.id, link_id(doc), link_title(module_node, doc))
       end)
 
     ~s/{"key":"#{HTML.text_to_id(group)}","name":"#{group}","nodes":[#{objects}]}/
   end
 
-  defp sidebar_items_object(id, anchor) do
-    ~s/{"id":"#{id}","anchor":"#{URI.encode(anchor)}"}/
+  defp sidebar_items_object(id, anchor, title) do
+    ~s/{"id":"#{id}","anchor":"#{URI.encode(anchor)}","link_title":"#{title}"}/
   end
 
   defp sidebar_items_json_string(module_node, items) do
@@ -269,7 +290,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   defp link_heading(_match, tag, title, id, prefix) do
     """
     <#{tag} id="#{prefix}#{id}" class="section-heading">
-      <a href="##{prefix}#{id}" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+      <a href="##{prefix}#{id}" class="hover-link" title="Link to #{prefix}#{id}"><span class="icon-link" aria-hidden="true"></span></a>
       #{title}
     </#{tag}>
     """
