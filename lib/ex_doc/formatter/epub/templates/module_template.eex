@@ -12,7 +12,7 @@
     <%= if Enum.any?(summary, fn {_, v} -> v != [] end) do %>
       <section id="summary" class="details-list">
         <h1 class="section-heading">
-          <a class="hover-link" href="#summary">
+          <a class="hover-link" href="#summary" title="Link to module-summary">
             <span class="icon-link" aria-hidden="true"></span>
             <span class="sr-only">Anchor for this section</span>
           </a>
@@ -25,7 +25,7 @@
     <%= for {name, nodes} <- summary, nodes != [], key = HTML.text_to_id(name) do %>
       <section id="<%= key %>" class="details-list">
         <h1 class="section-heading">
-          <a class="hover-link" href="#<%= key %>">
+          <a class="hover-link" href="#<%= key %>" title="Link to <%= key %>">
             <span class="icon-link" aria-hidden="true"></span>
             <span class="sr-only">Anchor for this section</span>
           </a>

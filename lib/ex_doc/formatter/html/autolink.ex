@@ -10,7 +10,9 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   @elixir_docs "https://hexdocs.pm/"
   @erlang_docs "http://www.erlang.org/doc/man/"
   @basic_types_page "typespecs.html#basic-types"
+  @basic_types_link_title "Basic types — Typespecs"
   @built_in_types_page "typespecs.html#built-in-types"
+  @built_in_types_link_title "Built-in types — Typespecs"
 
   @basic_types [
     any: 0,
@@ -188,6 +190,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
   defp all_typespecs(module, compiled) do
     %{aliases: aliases, lib_dirs: lib_dirs} = compiled
+    module_name = module.title
 
     locals =
       Enum.map(module.typespecs, fn
@@ -196,14 +199,15 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
     typespecs =
       for typespec <- module.typespecs do
-        %{typespec | spec: typespec(typespec.spec, locals, aliases, lib_dirs)}
+        %{typespec | spec: typespec(typespec.spec, locals, module_name, aliases, lib_dirs)}
       end
 
     docs =
       for module_node <- module.docs do
         %{
           module_node
-          | specs: Enum.map(module_node.specs, &typespec(&1, locals, aliases, lib_dirs))
+          | specs:
+              Enum.map(module_node.specs, &typespec(&1, locals, module_name, aliases, lib_dirs))
         }
       end
 
@@ -216,15 +220,15 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   It converts the given `ast` to string while linking
   the locals given by `typespecs` as HTML.
   """
-  def typespec(ast, typespecs, aliases \\ [], lib_dirs \\ default_lib_dirs()) do
+  def typespec(ast, typespecs, module_name, aliases \\ [], lib_dirs \\ default_lib_dirs()) do
     {formatted, placeholders} =
-      format_and_extract_typespec_placeholders(ast, typespecs, aliases, lib_dirs)
+      format_and_extract_typespec_placeholders(ast, typespecs, module_name, aliases, lib_dirs)
 
     replace_placeholders(formatted, placeholders)
   end
 
   @doc false
-  def format_and_extract_typespec_placeholders(ast, typespecs, aliases, lib_dirs) do
+  def format_and_extract_typespec_placeholders(ast, typespecs, module_name, aliases, lib_dirs) do
     ref = make_ref()
     elixir_docs = get_elixir_docs(aliases, lib_dirs)
 
@@ -244,16 +248,17 @@ defmodule ExDoc.Formatter.HTML.Autolink do
           cond do
             {name, arity} in @basic_types ->
               url = elixir_docs <> @basic_types_page
-              put_placeholder(form, url, placeholders)
+              put_placeholder(form, url, @basic_types_link_title, placeholders)
 
             {name, arity} in @built_in_types ->
               url = elixir_docs <> @built_in_types_page
-              put_placeholder(form, url, placeholders)
+              put_placeholder(form, url, @built_in_types_link_title, placeholders)
 
             {name, arity} in typespecs ->
               n = enc_h("#{name}")
               url = "#t:#{n}/#{arity}"
-              put_placeholder(form, url, placeholders)
+              title = "t:#{module_name}.#{n}/#{arity}"
+              put_placeholder(form, url, title, placeholders)
 
             true ->
               {form, placeholders}
@@ -265,7 +270,8 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
           if source = get_source(alias, aliases, lib_dirs) do
             url = type_remote_url(source, alias, name, args)
-            put_placeholder(form, url, placeholders)
+            title = type_remote_link_title(source, alias, name, args)
+            put_placeholder(form, url, title, placeholders)
           else
             {form, placeholders}
           end
@@ -288,14 +294,22 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     "#{source}#{enc_h(inspect(alias))}.html#t:#{name}/#{length(args)}"
   end
 
-  defp typespec_string_to_link(string, url) do
-    {string_to_link, _string_with_parens} = split_string_to_link(string)
-    ~s[<a href="#{url}">#{h(string_to_link)}</a>]
+  defp type_remote_link_title(@erlang_docs, module, name, _args) do
+    "#{module}:#{name}"
   end
 
-  defp put_placeholder(form, url, placeholders) do
+  defp type_remote_link_title(_source, alias, name, args) do
+    "t:#{inspect(alias)}.#{name}/#{length(args)}"
+  end
+
+  defp typespec_string_to_link(string, url, title) do
+    {string_to_link, _string_with_parens} = split_string_to_link(string)
+    ~s[<a href="#{url}" title="#{title}">#{h(string_to_link)}</a>]
+  end
+
+  defp put_placeholder(form, url, title, placeholders) do
     string = Macro.to_string(form)
-    link = typespec_string_to_link(string, url)
+    link = typespec_string_to_link(string, url, title)
 
     case Enum.find(placeholders, fn {_key, value} -> value == link end) do
       {placeholder, _} ->

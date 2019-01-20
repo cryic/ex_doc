@@ -468,155 +468,182 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
 
   describe "typespecs" do
     test "formats operators" do
-      assert Autolink.typespec(quote(do: +foo() :: foo()), [], [], []) == ~s[+foo() :: foo()]
+      assert Autolink.typespec(quote(do: +foo() :: foo()), [], "Foo", [], []) ==
+               ~s[+foo() :: foo()]
 
-      assert Autolink.typespec(quote(do: foo() + foo() :: foo()), [], [], []) ==
+      assert Autolink.typespec(quote(do: foo() + foo() :: foo()), [], "Foo", [], []) ==
                ~s[foo() + foo() :: foo()]
     end
 
     test "strips parens" do
-      assert Autolink.typespec(quote(do: foo({}, bar())), [], []) == ~s[foo({}, bar())]
+      assert Autolink.typespec(quote(do: foo({}, bar())), [], "Foo", []) == ~s[foo({}, bar())]
     end
 
     test "autolinks locals" do
-      assert Autolink.typespec(quote(do: foo(1)), [foo: 1], []) ==
-               ~s[<a href="#t:foo/1">foo</a>(1)]
+      assert Autolink.typespec(quote(do: foo(1)), [foo: 1], "Foo", []) ==
+               ~s[<a href="#t:foo/1" title="t:Foo.foo/1">foo</a>(1)]
 
-      assert Autolink.typespec(quote(do: bar(foo(1))), [foo: 1], []) ==
-               ~s[bar(<a href="#t:foo/1">foo</a>(1))]
+      assert Autolink.typespec(quote(do: bar(foo(1))), [foo: 1], "Foo", []) ==
+               ~s[bar(<a href="#t:foo/1" title="t:Foo.foo/1">foo</a>(1))]
 
-      assert Autolink.typespec(quote(do: (bar(foo(1)) when bat: foo(1))), [foo: 1], []) ==
-               ~s[bar(<a href="#t:foo/1">foo</a>(1)) when bat: <a href=\"#t:foo/1\">foo</a>(1)]
+      assert Autolink.typespec(quote(do: (bar(foo(1)) when bat: foo(1))), [foo: 1], "Foo", []) ==
+               ~s[bar(<a href="#t:foo/1" title="t:Foo.foo/1">foo</a>(1)) when bat: <a href=\"#t:foo/1\" title="t:Foo.foo/1">foo</a>(1)]
 
-      assert Autolink.typespec(quote(do: bar(foo(1))), [], []) == ~s[bar(foo(1))]
+      assert Autolink.typespec(quote(do: bar(foo(1))), [], "Foo", []) == ~s[bar(foo(1))]
     end
 
     test "autolinks same type and function name" do
-      assert Autolink.typespec(quote(do: foo() :: foo()), [foo: 0], [], []) ==
-               ~s[foo() :: <a href="#t:foo/0">foo</a>()]
+      assert Autolink.typespec(quote(do: foo() :: foo()), [foo: 0], "Foo", [], []) ==
+               ~s[foo() :: <a href="#t:foo/0" title="t:Foo.foo/0">foo</a>()]
 
-      assert Autolink.typespec(quote(do: foo(1) :: foo(1)), [foo: 1], [], []) ==
-               ~s[foo(1) :: <a href="#t:foo/1">foo</a>(1)]
+      assert Autolink.typespec(quote(do: foo(1) :: foo(1)), [foo: 1], "Foo", [], []) ==
+               ~s[foo(1) :: <a href="#t:foo/1" title="t:Foo.foo/1">foo</a>(1)]
 
-      assert Autolink.typespec(quote(do: (foo(1) :: foo(1) when bat: foo(1))), [foo: 1], [], []) ==
-               ~s[foo(1) :: <a href=\"#t:foo/1\">foo</a>(1) when bat: <a href=\"#t:foo/1\">foo</a>(1)]
+      assert Autolink.typespec(
+               quote(do: (foo(1) :: foo(1) when bat: foo(1))),
+               [foo: 1],
+               "Foo",
+               [],
+               []
+             ) ==
+               ~s[foo(1) :: <a href=\"#t:foo/1\" title=\"t:Foo.foo/1\">foo</a>(1) when bat: <a href=\"#t:foo/1\" title=\"t:Foo.foo/1\">foo</a>(1)]
 
-      assert Autolink.typespec(quote(do: bar(foo(1)) :: foo(1)), [foo: 1], [], []) ==
-               ~s[bar(<a href=\"#t:foo/1\">foo</a>(1)) :: <a href=\"#t:foo/1\">foo</a>(1)]
+      assert Autolink.typespec(quote(do: bar(foo(1)) :: foo(1)), [foo: 1], "Foo", [], []) ==
+               ~s[bar(<a href=\"#t:foo/1\" title=\"t:Foo.foo/1\">foo</a>(1)) :: <a href=\"#t:foo/1\" title=\"t:Foo.foo/1\">foo</a>(1)]
 
-      assert Autolink.typespec(quote(do: (bar(f(1)) :: f(1) when bat: f(1))), [f: 1], [], []) ==
-               ~s[bar(<a href=\"#t:f/1\">f</a>(1)) :: <a href=\"#t:f/1\">f</a>(1) when bat: <a href=\"#t:f/1\">f</a>(1)]
+      assert Autolink.typespec(
+               quote(do: (bar(f(1)) :: f(1) when bat: f(1))),
+               [f: 1],
+               "Foo",
+               [],
+               []
+             ) ==
+               ~s[bar(<a href=\"#t:f/1\" title=\"t:Foo.f/1\">f</a>(1)) :: <a href=\"#t:f/1\" title=\"t:Foo.f/1\">f</a>(1) when bat: <a href=\"#t:f/1\" title=\"t:Foo.f/1\">f</a>(1)]
 
-      assert Autolink.typespec(quote(do: bar(foo :: foo(1)) :: foo(1)), [foo: 1], [], []) ==
-               ~s[bar(foo :: <a href=\"#t:foo/1\">foo</a>(1)) :: <a href=\"#t:foo/1\">foo</a>(1)]
+      assert Autolink.typespec(quote(do: bar(foo :: foo(1)) :: foo(1)), [foo: 1], "Foo", [], []) ==
+               ~s[bar(foo :: <a href=\"#t:foo/1\" title=\"t:Foo.foo/1\">foo</a>(1)) :: <a href=\"#t:foo/1\" title=\"t:Foo.foo/1\">foo</a>(1)]
     end
 
     test "autolinks Elixir types" do
-      assert Autolink.typespec(quote(do: String.t()), [], []) ==
-               ~s[<a href="#{@elixir_docs}elixir/String.html#t:t/0">String.t</a>()]
+      assert Autolink.typespec(quote(do: String.t()), [], "Foo", []) ==
+               ~s[<a href="#{@elixir_docs}elixir/String.html#t:t/0" title=\"t:String.t/0\">String.t</a>()]
 
-      assert Autolink.typespec(quote(do: Unknown.bar()), [], []) == ~s[Unknown.bar()]
+      assert Autolink.typespec(quote(do: Unknown.bar()), [], "Foo", []) == ~s[Unknown.bar()]
     end
 
     test "autolinks Elixir basic types" do
-      assert Autolink.typespec(quote(do: atom()), [], []) ==
-               ~s[<a href=\"#{@elixir_docs}elixir/typespecs.html#basic-types\">atom</a>()]
+      assert Autolink.typespec(quote(do: atom()), [], "Foo", []) ==
+               ~s[<a href=\"#{@elixir_docs}elixir/typespecs.html#basic-types\" title=\"Basic types — Typespecs\">atom</a>()]
     end
 
     test "autolinks Elixir built-in types" do
-      assert Autolink.typespec(quote(do: term()), [], []) ==
-               ~s[<a href=\"#{@elixir_docs}elixir/typespecs.html#built-in-types\">term</a>()]
+      assert Autolink.typespec(quote(do: term()), [], "Foo", []) ==
+               ~s[<a href=\"#{@elixir_docs}elixir/typespecs.html#built-in-types\" title="Built-in types — Typespecs">term</a>()]
 
-      assert Autolink.typespec(quote(do: term()), [], [Kernel]) ==
-               ~s[<a href=\"typespecs.html#built-in-types\">term</a>()]
+      assert Autolink.typespec(quote(do: term()), [], "Foo", [Kernel]) ==
+               ~s[<a href=\"typespecs.html#built-in-types\" title=\"Built-in types — Typespecs\">term</a>()]
     end
 
     test "autolinks Erlang types" do
-      assert Autolink.typespec(quote(do: :sets.set()), [], []) ==
-               ~s[<a href=\"#{@erlang_docs}sets.html#type-set\">:sets.set</a>()]
+      assert Autolink.typespec(quote(do: :sets.set()), [], "Foo", []) ==
+               ~s[<a href=\"#{@erlang_docs}sets.html#type-set\" title=\"sets:set\">:sets.set</a>()]
 
-      assert Autolink.typespec(quote(do: :sets.set(foo())), [], []) ==
-               ~s[<a href=\"#{@erlang_docs}sets.html#type-set\">:sets.set</a>(foo())]
+      assert Autolink.typespec(quote(do: :sets.set(foo())), [], "Foo", []) ==
+               ~s[<a href=\"#{@erlang_docs}sets.html#type-set\" title=\"sets:set\">:sets.set</a>(foo())]
 
-      assert Autolink.typespec(quote(do: :sets.set(foo())), [foo: 0], []) ==
-               ~s[<a href=\"#{@erlang_docs}sets.html#type-set\">:sets.set</a>(<a href=\"#t:foo/0\">foo</a>())]
+      assert Autolink.typespec(quote(do: :sets.set(foo())), [foo: 0], "Foo", []) ==
+               ~s[<a href=\"#{@erlang_docs}sets.html#type-set\" title=\"sets:set\">:sets.set</a>(<a href=\"#t:foo/0\" title=\"t:Foo.foo/0\">foo</a>())]
     end
 
     test "autolinks shared aliases" do
-      assert Autolink.typespec(quote(do: Foo.t()), [], [Foo]) ==
-               ~s[<a href="Foo.html#t:t/0">Foo.t</a>()]
+      assert Autolink.typespec(quote(do: Foo.t()), [], "Bar", [Foo]) ==
+               ~s[<a href="Foo.html#t:t/0" title="t:Foo.t/0">Foo.t</a>()]
     end
 
     test "autolinks inside parameterized types" do
-      assert Autolink.typespec(quote(do: t(foo())), [t: 1, foo: 0], []) ==
-               ~s[<a href="#t:t/1">t</a>(<a href="#t:foo/0">foo</a>())]
+      assert Autolink.typespec(quote(do: t(foo())), [t: 1, foo: 0], "Foo", []) ==
+               ~s[<a href="#t:t/1" title="t:Foo.t/1">t</a>(<a href="#t:foo/0" title="t:Foo.foo/0">foo</a>())]
 
-      assert Autolink.typespec(quote(do: Parameterized.t(foo())), [foo: 0], [Parameterized]) ==
-               ~s[<a href="Parameterized.html#t:t/1">Parameterized.t</a>(<a href="#t:foo/0">foo</a>())]
+      assert Autolink.typespec(quote(do: Parameterized.t(foo())), [foo: 0], "Foo", [Parameterized]) ==
+               ~s[<a href="Parameterized.html#t:t/1" title="t:Parameterized.t/1">Parameterized.t</a>(<a href="#t:foo/0" title="t:Foo.foo/0">foo</a>())]
 
-      assert Autolink.typespec(quote(do: parameterized_t(Foo.t())), [parameterized_t: 1], [Foo]) ==
-               ~s[<a href="#t:parameterized_t/1">parameterized_t</a>(<a href="Foo.html#t:t/0">Foo.t</a>())]
+      assert Autolink.typespec(quote(do: parameterized_t(Foo.t())), [parameterized_t: 1], "Bar", [
+               Foo
+             ]) ==
+               ~s[<a href="#t:parameterized_t/1" title="t:Bar.parameterized_t/1">parameterized_t</a>(<a href="Foo.html#t:t/0" title="t:Foo.t/0">Foo.t</a>())]
 
-      assert Autolink.typespec(quote(do: Parameterized.t(Foo.t())), [], [Parameterized, Foo]) ==
-               ~s[<a href="Parameterized.html#t:t/1">Parameterized.t</a>(<a href="Foo.html#t:t/0">Foo.t</a>())]
+      assert Autolink.typespec(quote(do: Parameterized.t(Foo.t())), [], "Bar", [
+               Parameterized,
+               Foo
+             ]) ==
+               ~s[<a href="Parameterized.html#t:t/1" title="t:Parameterized.t/1">Parameterized.t</a>(<a href="Foo.html#t:t/0" title="t:Foo.t/0">Foo.t</a>())]
 
-      assert Autolink.typespec(quote(do: t(foo() | bar())), [t: 1, foo: 0, bar: 0], []) ==
-               ~s[<a href="#t:t/1">t</a>(<a href="#t:foo/0">foo</a>() | <a href="#t:bar/0">bar</a>())]
+      assert Autolink.typespec(quote(do: t(foo() | bar())), [t: 1, foo: 0, bar: 0], "Foo", []) ==
+               ~s[<a href="#t:t/1" title="t:Foo.t/1">t</a>(<a href="#t:foo/0" title="t:Foo.foo/0">foo</a>() | <a href="#t:bar/0" title="t:Foo.bar/0">bar</a>())]
 
-      assert Autolink.typespec(quote(do: t(t(foo()))), [t: 1, foo: 0], []) ==
-               ~s[<a href="#t:t/1">t</a>(<a href="#t:t/1">t</a>(<a href="#t:foo/0">foo</a>()))]
+      assert Autolink.typespec(quote(do: t(t(foo()))), [t: 1, foo: 0], "Foo", []) ==
+               ~s[<a href="#t:t/1" title="t:Foo.t/1">t</a>(<a href="#t:t/1" title="t:Foo.t/1">t</a>(<a href="#t:foo/0" title="t:Foo.foo/0">foo</a>()))]
 
-      assert Autolink.typespec(quote(do: parameterized_t(foo())), [foo: 0], []) ==
-               ~s[parameterized_t(<a href="#t:foo/0">foo</a>())]
+      assert Autolink.typespec(quote(do: parameterized_t(foo())), [foo: 0], "Foo", []) ==
+               ~s[parameterized_t(<a href="#t:foo/0" title="t:Foo.foo/0">foo</a>())]
 
-      assert Autolink.typespec(quote(do: parameterized_t(atom())), [], []) ==
-               ~s[parameterized_t(<a href=\"#{@elixir_docs}elixir/typespecs.html#basic-types\">atom</a>())]
+      assert Autolink.typespec(quote(do: parameterized_t(atom())), [], "Foo", []) ==
+               ~s[parameterized_t(<a href=\"#{@elixir_docs}elixir/typespecs.html#basic-types\" title=\"Basic types — Typespecs\">atom</a>())]
 
-      assert Autolink.typespec(quote(do: parameterized_t(atom()) :: list(function())), [], []) ==
-               ~s[parameterized_t(<a href=\"#{@elixir_docs}elixir/typespecs.html#basic-types\">atom</a>()) :: ] <>
-                 ~s[<a href=\"#{@elixir_docs}elixir/typespecs.html#basic-types\">list</a>(] <>
-                 ~s[<a href=\"#{@elixir_docs}elixir/typespecs.html#built-in-types\">function</a>())]
+      assert Autolink.typespec(
+               quote(do: parameterized_t(atom()) :: list(function())),
+               [],
+               "Foo",
+               []
+             ) ==
+               ~s[parameterized_t(<a href=\"#{@elixir_docs}elixir/typespecs.html#basic-types\" title=\"Basic types — Typespecs\">atom</a>()) :: ] <>
+                 ~s[<a href=\"#{@elixir_docs}elixir/typespecs.html#basic-types\" title=\"Basic types — Typespecs\">list</a>(] <>
+                 ~s[<a href=\"#{@elixir_docs}elixir/typespecs.html#built-in-types\" title=\"Built-in types — Typespecs\">function</a>())]
     end
 
     test "placeholders" do
       assert_typespec_placeholders(
         "t()",
         "_p1_()",
-        t: 0
+        [t: 0],
+        ""
       )
 
       assert_typespec_placeholders(
         "foobar()",
         "_ppp1_()",
-        foobar: 0
+        [foobar: 0],
+        ""
       )
 
       assert_typespec_placeholders(
         "Mod.foobar()",
         "_ppppppp1_()",
         [],
+        "",
         [Mod]
       )
 
       assert_typespec_placeholders(
         "foobar(barbaz())",
         "_ppp1_(_ppp2_())",
-        foobar: 1,
-        barbaz: 0
+        [foobar: 1, barbaz: 0],
+        ""
       )
 
       assert_typespec_placeholders(
         "Mod.foobar(Mod.barbaz())",
         "_ppppppp1_(_ppppppp2_())",
         [],
+        "",
         [Mod]
       )
 
       assert_typespec_placeholders(
         "foobar(foobar(barbaz()))",
         "_ppp1_(_ppp1_(_ppp2_()))",
-        foobar: 1,
-        barbaz: 0
+        [foobar: 1, barbaz: 0],
+        ""
       )
     end
   end
@@ -631,9 +658,12 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
 
   ##  Helpers
 
-  defp assert_typespec_placeholders(original, expected, typespecs, aliases \\ []) do
+  defp assert_typespec_placeholders(original, expected, typespecs, module_name, aliases \\ []) do
     ast = Code.string_to_quoted!(original)
-    {actual, _} = Autolink.format_and_extract_typespec_placeholders(ast, typespecs, aliases, [])
+
+    {actual, _} =
+      Autolink.format_and_extract_typespec_placeholders(ast, typespecs, module_name, aliases, [])
+
     assert actual == expected, "Original: #{original}\nExpected: #{expected}\nActual:   #{actual}"
   end
 
