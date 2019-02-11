@@ -17,7 +17,6 @@ import markdown from 'highlight.js/lib/languages/markdown'
 import sql from 'highlight.js/lib/languages/sql'
 import xml from 'highlight.js/lib/languages/xml'
 
-import hasContent from './template-helpers/hasContent'
 import isArray from './template-helpers/isArray'
 import isLocal from './template-helpers/isLocal'
 import groupChanged from './template-helpers/groupChanged'
@@ -26,6 +25,7 @@ import showSummary from './template-helpers/showSummary'
 
 import {initialize as initEvents} from './events'
 import {initialize as initSidebar} from './sidebar'
+import {initialize as initVersions} from './versions'
 import {initialize as initNightMode} from './night'
 import {initialize as initMakeup} from './makeup'
 
@@ -33,7 +33,6 @@ window.$ = $
 
 $(() => {
   // Set up Handlebars.js
-  Handlebars.registerHelper('hasContent', hasContent)
   Handlebars.registerHelper('isArray', isArray)
   Handlebars.registerHelper('isLocal', isLocal)
   Handlebars.registerHelper('groupChanged', groupChanged)
@@ -59,6 +58,7 @@ $(() => {
 
   initNightMode()
   initSidebar()
+  initVersions()
   initEvents()
   initMakeup()
   hljs.initHighlighting()

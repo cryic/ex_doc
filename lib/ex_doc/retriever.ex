@@ -97,6 +97,11 @@ defmodule ExDoc.Retriever do
         {:error, reason} ->
           raise Error,
                 "module #{inspect(module)} was not compiled with flag --docs: #{inspect(reason)}"
+
+        _ ->
+          raise Error,
+                "unknown format in Docs chunk. This likely means you are running on " <>
+                  "a more recent Elixir version that is not supported by ExDoc. Please update."
       end
     else
       false
@@ -137,10 +142,10 @@ defmodule ExDoc.Retriever do
       type: module_data.type,
       deprecated: metadata[:deprecated],
       function_groups: function_groups,
-      docs: Enum.sort_by(docs, &{&1.name, &1.id}),
+      docs: Enum.sort_by(docs, &{&1.name, &1.arity}),
       doc: moduledoc,
       doc_line: doc_line,
-      typespecs: Enum.sort_by(types, & &1.id),
+      typespecs: Enum.sort_by(types, &{&1.name, &1.arity}),
       source_path: source_path,
       source_url: source_link(source, line)
     }
@@ -451,11 +456,11 @@ defmodule ExDoc.Retriever do
   defp strip_types(args, arity) do
     args
     |> Enum.take(-arity)
-    |> Enum.with_index()
+    |> Enum.with_index(1)
     |> Enum.map(fn
-      {{:::, _, [left, _]}, i} -> to_var(left, i)
-      {{:|, _, _}, i} -> to_var({}, i)
-      {left, i} -> to_var(left, i)
+      {{:::, _, [left, _]}, position} -> to_var(left, position)
+      {{:|, _, _}, position} -> to_var({}, position)
+      {left, position} -> to_var(left, position)
     end)
   end
 
@@ -469,7 +474,7 @@ defmodule ExDoc.Retriever do
   defp to_var(float, _) when is_integer(float), do: {:float, [], nil}
   defp to_var(list, _) when is_list(list), do: {:list, [], nil}
   defp to_var(atom, _) when is_atom(atom), do: {:atom, [], nil}
-  defp to_var(_, i), do: {:"arg#{i}", [], nil}
+  defp to_var(_, position), do: {:"arg#{position}", [], nil}
 
   ## General helpers
 

@@ -1,7 +1,5 @@
 defmodule ExDoc.Formatter.HTML.Autolink do
-  @moduledoc """
-  Conveniences for autolinking.
-  """
+  @moduledoc false
   import ExDoc.Formatter.HTML.Templates, only: [h: 1, enc_h: 1]
 
   @type language :: :elixir | :erlang | :markdown
@@ -379,8 +377,8 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     lib_dirs = options[:lib_dirs] || default_lib_dirs(:erlang)
 
     fn all, text, match ->
-      pmfa = {_prefix, module, function, arity} = split_function(match)
-      text = default_text(:erlang, link_type, match, pmfa, text)
+      pmfa = {_prefix, module, function, arity} = split_match(kind, match)
+      text = default_text(":", link_type, pmfa, text)
 
       if doc = module_docs(:erlang, module, lib_dirs) do
         case kind do
@@ -396,22 +394,25 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     end
   end
 
-  defp replace_fun(:module, :elixir, _link_type, options) do
+  defp replace_fun(:module, :elixir, link_type, options) do
     extension = options[:extension] || ".html"
     lib_dirs = options[:lib_dirs] || default_lib_dirs(:elixir)
     module_id = options[:module_id] || nil
     modules_refs = options[:modules_refs] || []
 
-    fn all, _text, match ->
+    fn all, text, match ->
+      pmfa = split_match(:module, match)
+      text = default_text("", link_type, pmfa, text)
+
       cond do
         match == module_id ->
-          "[`#{match}`](#{match}#{extension}#content)"
+          "[#{text}](#content)"
 
         match in modules_refs ->
-          "[`#{match}`](#{match}#{extension})"
+          "[#{text}](#{match}#{extension})"
 
         doc = module_docs(:elixir, match, lib_dirs) ->
-          "[`#{match}`](#{doc}#{match}.html)"
+          "[#{text}](#{doc}#{match}.html)"
 
         true ->
           all
@@ -432,8 +433,8 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     skip_warnings_on = options[:skip_undefined_reference_warnings_on] || []
 
     fn all, text, match ->
-      pmfa = {prefix, module, function, arity} = split_function(match)
-      text = default_text(:elixir, link_type, match, pmfa, text)
+      pmfa = {prefix, module, function, arity} = split_match(:function, match)
+      text = default_text("", link_type, pmfa, text)
 
       cond do
         match in locals ->
@@ -486,7 +487,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
       cond do
         match == module_id ->
-          "[#{text}](#{match}#{extension}#content)"
+          "[#{text}](#content)"
 
         match in modules_refs ->
           "[#{text}](#{match}#{extension})"
@@ -515,21 +516,19 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   end
 
   ## Helpers
+  defp default_text(module_prefix, link_type, pmfa, link_text)
 
-  defp default_text(_, :custom, _match, _pmfa, text),
-    do: text
+  defp default_text(_, :custom, _, link_text),
+    do: link_text
 
-  defp default_text(:erlang, _link_type, match, _pmfa, _text),
-    do: "`#{match}`"
+  defp default_text(_, _, {_, "", fun, arity}, _link_text),
+    do: "`#{fun}/#{arity}`"
 
-  defp default_text(:elixir, _link_type, _match, {_prefix, module, function, arity}, _text) do
-    if module == "" do
-      # local
-      "`#{function}/#{arity}`"
-    else
-      "`#{module}.#{function}/#{arity}`"
-    end
-  end
+  defp default_text(module_prefix, _, {_, module, "", ""}, _link_text),
+    do: "`#{module_prefix}#{module}`"
+
+  defp default_text(module_prefix, _, {_, module, fun, arity}, _link_text),
+    do: "`#{module_prefix}#{module}.#{fun}/#{arity}`"
 
   defp default_lib_dirs(),
     do: default_lib_dirs(:elixir) ++ default_lib_dirs(:erlang)
@@ -547,33 +546,27 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     do: lib_dirs_to_doc(module, lib_dirs)
 
   @doc false
-  def split_function(string) when is_binary(string),
-    do: split_function_string(string)
+  defp split_match(:module, string), do: {"", string, "", ""}
+  defp split_match(:function, string), do: split_function(string)
 
-  defp split_function_string("c:" <> string) do
+  defp split_function("c:" <> string) do
     {_, mod, fun, arity} = split_function(string)
     {"c:", mod, fun, arity}
   end
 
-  defp split_function_string("t:" <> string) do
-    {_, mod, fun, arity} = split_function_string(string)
+  defp split_function("t:" <> string) do
+    {_, mod, fun, arity} = split_function(string)
     {"t:", mod, fun, arity}
   end
 
-  defp split_function_string(":" <> string) do
-    {_, mod, fun, arity} = split_function_string(string)
-    {":", mod, fun, arity}
+  defp split_function(":" <> string) do
+    split_function(string)
   end
 
-  defp split_function_string(string) do
+  defp split_function(string) do
     string
     |> String.split("/")
     |> split_function_list()
-  end
-
-  # handles a single module
-  defp split_function_list([module]) do
-    {"", module, "", ""}
   end
 
   defp split_function_list([modules, arity]) do

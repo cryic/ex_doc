@@ -1,5 +1,33 @@
 # Changelog
 
+## v0.19.3
+
+  * Enhancements
+    * Include a "goto" link on mouseover for expandable menu items
+
+  * Bug fixes
+    * Always expand menu items, even if has a single child
+    * Fix sidebar bottom margin on Firefox
+    * Fix anchor links sometimes not working by moving js to html head
+    * Unify code styling for makeup and hljs
+    * Do not replace the content of custom links pointing to Elixir modules
+    * Remove border-left on deprecated to not mistake it with a heading
+
+## v0.19.2
+
+  * Enhancements
+    * Allow logo in SVG extension
+    * Allow functions to be grouped based on metadata
+    * Allow api-reference.html page to be disabled
+    * Allow nesting of modules by prefix
+    * Autolink `mix help TASK`
+    * Warn on undefined remote functions from project's docs
+
+  * Bug fixes
+    * Sort function names alphabetically in the sidebar
+    * Fix search input color
+    * Disable earmark smartypants option
+
 ## v0.19.1
 
   * Enhancements
