@@ -46,30 +46,30 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     test "generates headers with hovers" do
       assert Templates.link_headings("<h2>Foo</h2><h2>Bar</h2>") == """
              <h2 id="foo" class="section-heading">
-               <a href="#foo" class="hover-link" title="Link to foo"><span class="icon-link" aria-hidden="true"></span></a>
+               <a href="#foo" class="hover-link" title=" foo"><span class="icon-link" aria-hidden="true"></span></a>
                Foo
              </h2>
              <h2 id="bar" class="section-heading">
-               <a href="#bar" class="hover-link" title="Link to bar"><span class="icon-link" aria-hidden="true"></span></a>
+               <a href="#bar" class="hover-link" title=" bar"><span class="icon-link" aria-hidden="true"></span></a>
                Bar
              </h2>
              """
 
       assert Templates.link_headings("<h2>Foo</h2>\n<h2>Bar</h2>") == """
              <h2 id="foo" class="section-heading">
-               <a href="#foo" class="hover-link" title="Link to foo"><span class="icon-link" aria-hidden="true"></span></a>
+               <a href="#foo" class="hover-link" title=" foo"><span class="icon-link" aria-hidden="true"></span></a>
                Foo
              </h2>
 
              <h2 id="bar" class="section-heading">
-               <a href="#bar" class="hover-link" title="Link to bar"><span class="icon-link" aria-hidden="true"></span></a>
+               <a href="#bar" class="hover-link" title=" bar"><span class="icon-link" aria-hidden="true"></span></a>
                Bar
              </h2>
              """
 
       assert Templates.link_headings("<h2></h2><h2>Bar</h2>") == """
              <h2></h2><h2 id="bar" class="section-heading">
-               <a href="#bar" class="hover-link" title="Link to bar"><span class="icon-link" aria-hidden="true"></span></a>
+               <a href="#bar" class="hover-link" title=" bar"><span class="icon-link" aria-hidden="true"></span></a>
                Bar
              </h2>
              """
@@ -77,7 +77,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       assert Templates.link_headings("<h2></h2>\n<h2>Bar</h2>") == """
              <h2></h2>
              <h2 id="bar" class="section-heading">
-               <a href="#bar" class="hover-link" title="Link to bar"><span class="icon-link" aria-hidden="true"></span></a>
+               <a href="#bar" class="hover-link" title=" bar"><span class="icon-link" aria-hidden="true"></span></a>
                Bar
              </h2>
              """
@@ -85,7 +85,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       assert Templates.link_headings("<h2>Foo</h2><h2></h2>") ==
                String.trim_trailing("""
                <h2 id="foo" class="section-heading">
-                 <a href="#foo" class="hover-link" title="Link to foo"><span class="icon-link" aria-hidden="true"></span></a>
+                 <a href="#foo" class="hover-link" title=" foo"><span class="icon-link" aria-hidden="true"></span></a>
                  Foo
                </h2>
                <h2></h2>
@@ -94,7 +94,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       assert Templates.link_headings("<h2>Foo</h2>\n<h2></h2>") ==
                String.trim_trailing("""
                <h2 id="foo" class="section-heading">
-                 <a href="#foo" class="hover-link" title="Link to foo"><span class="icon-link" aria-hidden="true"></span></a>
+                 <a href="#foo" class="hover-link" title=" foo"><span class="icon-link" aria-hidden="true"></span></a>
                  Foo
                </h2>
 
@@ -103,7 +103,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
       assert Templates.link_headings("<h3>Foo</h3>") == """
              <h3 id="foo" class="section-heading">
-               <a href="#foo" class="hover-link" title="Link to foo"><span class="icon-link" aria-hidden="true"></span></a>
+               <a href="#foo" class="hover-link" title=" foo"><span class="icon-link" aria-hidden="true"></span></a>
                Foo
              </h3>
              """
@@ -273,10 +273,10 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
                ~r{moduledoc.*Example.*<span class="nc">CompiledWithDocs</span><span class="o">\.</span><span class="n">example</span>.*}ms
 
       assert content =~
-               ~r{<h2 id="module-example-unicode-escaping" class="section-heading">.*<a href="#module-example-unicode-escaping" class="hover-link" title=\"Link to module-example-unicode-escaping\">.*<span class="icon-link" aria-hidden="true"></span>.*</a>.*Example.*</h2>}ms
+               ~r{<h2 id="module-example-unicode-escaping" class="section-heading">.*<a href="#module-example-unicode-escaping" class="hover-link" title=\" example-unicode-escaping\">.*<span class="icon-link" aria-hidden="true"></span>.*</a>.*Example.*</h2>}ms
 
       assert content =~
-               ~r{<h3 id="module-example-h3-heading" class="section-heading">.*<a href="#module-example-h3-heading" class="hover-link" title=\"Link to module-example-h3-heading\">.*<span class="icon-link" aria-hidden="true"></span>.*</a>.*Example H3 heading.*</h3>}ms
+               ~r{<h3 id="module-example-h3-heading" class="section-heading">.*<a href="#module-example-h3-heading" class="hover-link" title=\" example-h3-heading\">.*<span class="icon-link" aria-hidden="true"></span>.*</a>.*Example H3 heading.*</h3>}ms
 
       # Summaries
       assert content =~ ~r{example/2.*Some example}ms
@@ -382,7 +382,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       content = get_module_page([CompiledWithDocs])
 
       assert content =~
-               ~r{<h3 id="example_with_h3/0-examples" class="section-heading">.*<a href="#example_with_h3/0-examples" class="hover-link" title="Link to example_with_h3/0-examples">.*<span class="icon-link" aria-hidden="true"></span>.*</a>.*Examples.*</h3>}ms
+               ~r{<h3 id="example_with_h3/0-examples" class="section-heading">.*<a href="#example_with_h3/0-examples" class="hover-link" title="CompiledWithDocs.example_with_h3/0 examples">.*<span class="icon-link" aria-hidden="true"></span>.*</a>.*Examples.*</h3>}ms
     end
 
     ## BEHAVIOURS

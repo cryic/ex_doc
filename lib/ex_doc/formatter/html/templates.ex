@@ -275,22 +275,22 @@ defmodule ExDoc.Formatter.HTML.Templates do
   prefixed with `prefix`.
   """
   @heading_regex ~r/<(h[23]).*?>(.*?)<\/\1>/m
-  @spec link_headings(String.t(), Regex.t(), String.t()) :: String.t()
-  def link_headings(content, regex \\ @heading_regex, prefix \\ "")
-  def link_headings(nil, _, _), do: nil
+  @spec link_headings(String.t(), Regex.t(), String.t(), String.t()) :: String.t()
+  def link_headings(content, regex \\ @heading_regex, prefix \\ "", link_title \\ "")
+  def link_headings(nil, _, _, _), do: nil
 
-  def link_headings(content, regex, prefix) do
+  def link_headings(content, regex, prefix, link_title) do
     Regex.replace(regex, content, fn match, tag, title ->
-      link_heading(match, tag, title, HTML.text_to_id(title), prefix)
+      link_heading(match, tag, title, HTML.text_to_id(title), prefix, link_title)
     end)
   end
 
-  defp link_heading(match, _tag, _title, "", _prefix), do: match
+  defp link_heading(match, _tag, _title, "", _prefix, _link_title), do: match
 
-  defp link_heading(_match, tag, title, id, prefix) do
+  defp link_heading(_match, tag, title, id, prefix, link_title) do
     """
     <#{tag} id="#{prefix}#{id}" class="section-heading">
-      <a href="##{prefix}#{id}" class="hover-link" title="Link to #{prefix}#{id}"><span class="icon-link" aria-hidden="true"></span></a>
+      <a href="##{prefix}#{id}" class="hover-link" title="#{link_title} #{id}"><span class="icon-link" aria-hidden="true"></span></a>
       #{title}
     </#{tag}>
     """
@@ -300,8 +300,8 @@ defmodule ExDoc.Formatter.HTML.Templates do
     link_headings(content, @heading_regex, "module-")
   end
 
-  defp link_detail_headings(content, prefix) do
-    link_headings(content, @heading_regex, prefix <> "-")
+  defp link_detail_headings(content, prefix, link_title) do
+    link_headings(content, @heading_regex, prefix <> "-", link_title)
   end
 
   templates = [
