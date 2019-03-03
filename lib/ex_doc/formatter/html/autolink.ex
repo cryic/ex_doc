@@ -420,13 +420,13 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
       cond do
         match == module_id ->
-          "[#{text}](#content)"
+          "[#{text}](#content '#{module_id} module')"
 
         match in modules_refs ->
-          "[#{text}](#{match}#{extension})"
+          "[#{text}](#{match}#{extension} '#{match} module')"
 
         doc = module_docs(:elixir, match, lib_dirs) ->
-          "[#{text}](#{doc}#{match}.html)"
+          "[#{text}](#{doc}#{match}.html '#{match} module')"
 
         true ->
           all
