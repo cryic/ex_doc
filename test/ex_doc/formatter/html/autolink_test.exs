@@ -320,6 +320,13 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
                docs_refs: ["MyModule"],
                module_id: "MyModule"
              }) == "```\nThis is a test.\n```\n\nSee [`MyModule`](#content 'MyModule module')."
+
+      assert project_doc(
+               "You can use `Kernel` functions/macros without the `Kernel` prefix anywhere",
+               %{docs_refs: ["Kernel"], module_id: "Kernel"}
+             ) ==
+               "You can use [`Kernel`](#content 'Kernel module')" <>
+                 " functions/macros without the [`Kernel`](#content 'Kernel module') prefix anywhere"
     end
 
     test "autolinks modules in elixir" do

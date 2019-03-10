@@ -389,11 +389,12 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   # The heart of the autolinking logic
   defp replace_fun(kind, :erlang, link_type, options) do
     lib_dirs = options[:lib_dirs] || default_lib_dirs(:erlang)
+    module_id = options[:module_id] || nil
 
     fn all, text, match ->
       pmfa = {_prefix, module, function, arity} = split_match(kind, match)
       text = default_text(":", link_type, pmfa, text)
-      title = default_title({":", module, function, arity})
+      title = default_title({":", module, function, arity}, module_id)
 
       if doc = module_docs(:erlang, module, lib_dirs) do
         case kind do
@@ -421,7 +422,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
       cond do
         match == module_id ->
-          "[#{text}](#content '#{module_id} module')"
+          "[#{text}](#content '#{match} module')"
 
         match in modules_refs ->
           "[#{text}](#{match}#{extension} '#{match} module')"
@@ -450,7 +451,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     fn all, text, match ->
       pmfa = {prefix, module, function, arity} = split_match(:function, match)
       text = default_text("", link_type, pmfa, text)
-      title = default_title(pmfa)
+      title = default_title(pmfa, module_id)
 
       cond do
         match in locals ->
@@ -548,8 +549,15 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   defp default_text(module_prefix, _, {_, module, fun, arity}, _link_text),
     do: "`#{module_prefix}#{module}.#{fun}/#{arity}`"
 
-  defp default_title({prefix, "", fun, arity}), do: "#{prefix}#{fun}/#{arity}"
-  defp default_title({prefix, module, fun, arity}), do: "#{prefix}#{module}.#{fun}/#{arity}"
+  defp default_title(pmfa, module_id)
+
+  defp default_title({prefix, "", fun, arity}, nil), do: "#{prefix}#{fun}/#{arity}"
+
+  defp default_title({prefix, "", fun, arity}, module_id),
+    do: "#{prefix}#{module_id}.#{fun}/#{arity}"
+
+  defp default_title({prefix, module, fun, arity}, _),
+    do: "#{prefix}#{module}.#{fun}/#{arity}"
 
   defp default_lib_dirs(),
     do: default_lib_dirs(:elixir) ++ default_lib_dirs(:erlang)
