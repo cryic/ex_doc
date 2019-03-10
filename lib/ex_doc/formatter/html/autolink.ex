@@ -393,14 +393,15 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     fn all, text, match ->
       pmfa = {_prefix, module, function, arity} = split_match(kind, match)
       text = default_text(":", link_type, pmfa, text)
+      title = default_title({":", module, function, arity})
 
       if doc = module_docs(:erlang, module, lib_dirs) do
         case kind do
           :module ->
-            "[#{text}](#{doc}#{module}.html)"
+            "[#{text}](#{doc}#{module}.html '#{title}')"
 
           :function ->
-            "[#{text}](#{doc}#{module}.html##{function}-#{arity})"
+            "[#{text}](#{doc}#{module}.html##{function}-#{arity} '#{title}')"
         end
       else
         all
@@ -449,26 +450,29 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     fn all, text, match ->
       pmfa = {prefix, module, function, arity} = split_match(:function, match)
       text = default_text("", link_type, pmfa, text)
+      title = default_title(pmfa)
 
       cond do
         match in locals ->
-          "[#{text}](##{prefix}#{enc_h(function)}/#{arity})"
+          "[#{text}](##{prefix}#{enc_h(function)}/#{arity} '#{title}')"
 
         match in docs_refs ->
-          "[#{text}](#{module}#{extension}##{prefix}#{enc_h(function)}/#{arity})"
+          "[#{text}](#{module}#{extension}##{prefix}#{enc_h(function)}/#{arity} '#{title}')"
 
         match in @basic_type_strings ->
-          "[#{text}](#{elixir_docs}#{@basic_types_page})"
+          "[#{text}](#{elixir_docs}#{@basic_types_page} '#{@basic_types_link_title}')"
 
         match in @built_in_type_strings ->
-          "[#{text}](#{elixir_docs}#{@built_in_types_page})"
+          "[#{text}](#{elixir_docs}#{@built_in_types_page} '#{@built_in_types_link_title}')"
 
         match in @kernel_function_strings ->
-          "[#{text}](#{elixir_docs}Kernel#{extension}##{prefix}#{enc_h(function)}/#{arity})"
+          "[#{text}](#{elixir_docs}Kernel#{extension}##{prefix}#{enc_h(function)}/#{arity}" <>
+            " 'Kernel.#{function}/#{arity}')"
 
         match in @special_form_strings ->
           "[#{text}](#{elixir_docs}Kernel.SpecialForms" <>
-            "#{extension}##{prefix}#{enc_h(function)}/#{arity})"
+            "#{extension}##{prefix}#{enc_h(function)}/#{arity}" <>
+            " 'Kernel.SpecialForms.#{function}/#{arity}')"
 
         module in modules_refs ->
           if module_id not in skip_warnings_on and id not in skip_warnings_on do
@@ -482,7 +486,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
           all
 
         doc = module_docs(:elixir, module, lib_dirs) ->
-          "[#{text}](#{doc}#{module}.html##{prefix}#{enc_h(function)}/#{arity})"
+          "[#{text}](#{doc}#{module}.html##{prefix}#{enc_h(function)}/#{arity} '#{title}')"
 
         true ->
           all
@@ -501,13 +505,13 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
       cond do
         match == module_id ->
-          "[#{text}](#content)"
+          "[#{text}](#content '#{match}')"
 
         match in modules_refs ->
-          "[#{text}](#{match}#{extension})"
+          "[#{text}](#{match}#{extension} '#{match}')"
 
         doc = module_docs(:elixir, match, lib_dirs) ->
-          "[#{text}](#{doc}#{match}.html)"
+          "[#{text}](#{doc}#{match}.html '#{match}')"
 
         true ->
           all
@@ -543,6 +547,9 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
   defp default_text(module_prefix, _, {_, module, fun, arity}, _link_text),
     do: "`#{module_prefix}#{module}.#{fun}/#{arity}`"
+
+  defp default_title({prefix, "", fun, arity}), do: "#{prefix}#{fun}/#{arity}"
+  defp default_title({prefix, module, fun, arity}), do: "#{prefix}#{module}.#{fun}/#{arity}"
 
   defp default_lib_dirs(),
     do: default_lib_dirs(:elixir) ++ default_lib_dirs(:erlang)

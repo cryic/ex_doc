@@ -280,31 +280,32 @@ defmodule ExDoc.Formatter.HTMLTest do
       assert content =~
                ~r{<h2 id="more-than" class="section-heading">.*<a href="#more-than" class="hover-link" title=" more-than"><span class="icon-link" aria-hidden="true"></span></a>.*more &gt; than.*</h2>}ms
 
-      assert content =~ ~r{<a href="RandomError.html"><code(\sclass="inline")?>RandomError</code>}
+      assert content =~
+               ~r{<a href="RandomError.html" title="RandomError module"><code(\sclass="inline")?>RandomError</code>}
 
       assert content =~
-               ~r{<a href="CustomBehaviourImpl.html#hello/1"><code(\sclass="inline")?>CustomBehaviourImpl.hello/1</code>}
+               ~r{<a href="CustomBehaviourImpl.html#hello/1" title="CustomBehaviourImpl.hello/1"><code(\sclass="inline")?>CustomBehaviourImpl.hello/1</code>}
 
       assert content =~
-               ~r{<a href="TypesAndSpecs.Sub.html"><code(\sclass="inline")?>TypesAndSpecs.Sub</code></a>}
+               ~r{<a href="TypesAndSpecs.Sub.html" title="TypesAndSpecs.Sub module"><code(\sclass="inline")?>TypesAndSpecs.Sub</code></a>}
 
       assert content =~
-               ~r{<a href="TypesAndSpecs.Sub.html"><code(\sclass="inline")?>TypesAndSpecs.Sub</code></a>}
+               ~r{<a href="TypesAndSpecs.Sub.html" title="TypesAndSpecs.Sub module"><code(\sclass="inline")?>TypesAndSpecs.Sub</code></a>}
 
       assert content =~
-               ~r{<a href="https://hexdocs.pm/elixir/Kernel.html#is_atom/1"><code(\sclass="inline")?>is_atom/1</code></a>}
+               ~r{<a href="https://hexdocs.pm/elixir/Kernel.html#is_atom/1" title="Kernel.is_atom/1"><code(\sclass="inline")?>is_atom/1</code></a>}
 
       assert content =~
-               ~r{<a href="https://hexdocs.pm/elixir/Kernel.html#==/2"><code(\sclass="inline")?>==/2</code></a>}
+               ~r{<a href="https://hexdocs.pm/elixir/Kernel.html#==/2" title="Kernel.==/2"><code(\sclass="inline")?>==/2</code></a>}
 
       assert content =~
-               ~r{<a href="https://hexdocs.pm/elixir/Kernel.html#===/2"><code(\sclass="inline")?>===</code></a>}
+               ~r{<a href="https://hexdocs.pm/elixir/Kernel.html#===/2" title="Kernel.===/2"><code(\sclass="inline")?>===</code></a>}
 
       assert content =~
-               ~r{<a href="https://hexdocs.pm/elixir/typespecs.html#basic-types"><code(\sclass="inline")?>atom/0</code></a>}
+               ~r{<a href="https://hexdocs.pm/elixir/typespecs.html#basic-types" title="Basic types — Typespecs"><code(\sclass="inline")?>atom/0</code></a>}
 
       assert content =~
-               ~r{<a href="https://hexdocs.pm/mix/Mix.Tasks.Compile.Elixir.html"><code(\sclass="inline")?>mix compile.elixir</code></a>}
+               ~r{<a href="https://hexdocs.pm/mix/Mix.Tasks.Compile.Elixir.html" title="Mix.Tasks.Compile.Elixir"><code(\sclass="inline")?>mix compile.elixir</code></a>}
     end
 
     test "without any other content" do
