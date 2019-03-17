@@ -27,7 +27,7 @@
       <%= if Enum.any?(summary, fn {_, v} -> v != [] end) do %>
         <section id="summary" class="details-list">
           <h1 class="section-heading">
-            <a class="hover-link" href="#summary" title="Link to <%= module.title %> Summary">
+            <a class="hover-link" href="#summary" title="Link to <%= module.title %> summary">
               <span class="icon-link" aria-hidden="true"></span>
               <span class="sr-only">Link to this section <%= module.title %> Summary</span>
             </a>
