@@ -8,21 +8,21 @@
     {{#each results}}
       <div class="result">
         <h3 class="result-id">
-          <a href="{{id}}.html">{{{match}}}</a>
+          <a href="{{id}}.html" title="{{id}} module">{{{match}}}</a>
         </h3>
         <ul class="functions">
           {{#each functions}}
-            <li class="result-elem"><a href="{{../id}}.html#{{{anchor}}}" title="Link to {{../id}}.{{anchor}}">{{{match}}}</a></li>
+            <li class="result-elem"><a href="{{../id}}.html#{{{anchor}}}" title="{{link_title}}">{{{match}}}</a></li>
           {{/each}}
         </ul>
         <ul class="callbacks">
           {{#each callbacks}}
-            <li class="result-elem"><a href="{{../id}}.html#{{{anchor}}}" title="Link to {{../id}}.{{anchor}}">{{{match}}}</a> (callback)</li>
+            <li class="result-elem"><a href="{{../id}}.html#{{{anchor}}}" title="{{link_title}}">{{{match}}}</a> (callback)</li>
           {{/each}}
         </ul>
         <ul class="types">
           {{#each types}}
-            <li class="result-elem"><a href="{{../id}}.html#{{{anchor}}}" title="Link to {{../id}}.{{anchor}}">{{{match}}}</a> (type)</li>
+            <li class="result-elem"><a href="{{../id}}.html#{{{anchor}}}" title="{{link_title}}">{{{match}}}</a> (type)</li>
           {{/each}}
         </ul>
       </div>

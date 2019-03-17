@@ -273,10 +273,10 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
                ~r{moduledoc.*Example.*<span class="nc">CompiledWithDocs</span><span class="o">\.</span><span class="n">example</span>.*}ms
 
       assert content =~
-               ~r{<h2 id="module-example-unicode-escaping" class="section-heading">.*<a href="#module-example-unicode-escaping" class="hover-link" title=\" example-unicode-escaping\">.*<span class="icon-link" aria-hidden="true"></span>.*</a>.*Example.*</h2>}ms
+               ~r{<h2 id="module-example-unicode-escaping" class="section-heading">.*<a href="#module-example-unicode-escaping" class="hover-link" title=\"CompiledWithDocs example-unicode-escaping\">.*<span class="icon-link" aria-hidden="true"></span>.*</a>.*Example.*</h2>}ms
 
       assert content =~
-               ~r{<h3 id="module-example-h3-heading" class="section-heading">.*<a href="#module-example-h3-heading" class="hover-link" title=\" example-h3-heading\">.*<span class="icon-link" aria-hidden="true"></span>.*</a>.*Example H3 heading.*</h3>}ms
+               ~r{<h3 id="module-example-h3-heading" class="section-heading">.*<a href="#module-example-h3-heading" class="hover-link" title=\"CompiledWithDocs example-h3-heading\">.*<span class="icon-link" aria-hidden="true"></span>.*</a>.*Example H3 heading.*</h3>}ms
 
       # Summaries
       assert content =~ ~r{example/2.*Some example}ms

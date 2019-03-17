@@ -296,8 +296,8 @@ defmodule ExDoc.Formatter.HTML.Templates do
     """
   end
 
-  defp link_moduledoc_headings(content) do
-    link_headings(content, @heading_regex, "module-")
+  defp link_moduledoc_headings(content, link_title) do
+    link_headings(content, @heading_regex, "module-", link_title)
   end
 
   defp link_detail_headings(content, prefix, link_title) do

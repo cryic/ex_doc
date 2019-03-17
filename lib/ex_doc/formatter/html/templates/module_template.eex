@@ -20,7 +20,7 @@
 
       <%= if module.doc do %>
         <section id="moduledoc">
-          <%= module.doc |> to_html(module) |> link_moduledoc_headings() %>
+          <%= module.doc |> to_html(module) |> link_moduledoc_headings(module.title) %>
         </section>
       <% end %>
 
@@ -29,7 +29,7 @@
           <h1 class="section-heading">
             <a class="hover-link" href="#summary" title="Link to <%= module.title %> summary">
               <span class="icon-link" aria-hidden="true"></span>
-              <span class="sr-only">Link to this section <%= module.title %> Summary</span>
+              <span class="sr-only">Link to this section <%= module.title %> summary</span>
             </a>
             Summary
           </h1>
