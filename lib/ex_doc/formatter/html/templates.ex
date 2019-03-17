@@ -290,7 +290,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   defp link_heading(_match, tag, title, id, prefix, link_title) do
     """
     <#{tag} id="#{prefix}#{id}" class="section-heading">
-      <a href="##{prefix}#{id}" class="hover-link" title="#{link_title} #{id}"><span class="icon-link" aria-hidden="true"></span></a>
+      <a href="##{prefix}#{id}" class="hover-link" title="Link to #{link_title} #{title}"><span class="icon-link" aria-hidden="true"></span></a>
       #{title}
     </#{tag}>
     """
@@ -302,6 +302,10 @@ defmodule ExDoc.Formatter.HTML.Templates do
 
   defp link_detail_headings(content, prefix, link_title) do
     link_headings(content, @heading_regex, prefix <> "-", link_title)
+  end
+
+  defp link_extras_headings(content, page_title) do
+    link_headings(content, @heading_regex, "", page_title)
   end
 
   templates = [
